@@ -1,0 +1,35 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Sep 20 21:51:52 2017
+
+@author: Sue
+"""
+import numpy as np
+import pandas as pd
+import gc
+
+
+class Predictor(object):
+    def __init__(self,model,sample,prop):
+        self.model=model
+        self.Xtest=None
+        self.sample=sample  # pd.read_csv('sample_submission.csv')
+        self.prop = prop
+
+    def createTestSet(self,prop):
+
+        self.sample['parcelid'] = self.sample['ParcelId']
+        self.Xtest = self.sample.merge(self.prop, on='parcelid', how='left')
+
+        self.Xtest = self.Xtest.drop(['parcelid','transactiondate'])
+
+        return xgb.DMatrix(self.Xtest)
+
+    def predict(self):
+        p_test = self.model.predict(self.createTestSet())
+     
+        for c in self.sample.columns[self.sample.columns != 'parcelId']:
+            self.sample[c] = p_test
+        
+        print('Writing csv ...')
+        self.sample.to_csv('xgb_starter.csv', index=False, float_format='%.4f')
