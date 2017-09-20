@@ -1,3 +1,4 @@
+import pandas as pd
 
 class Loader(object):
     def __init__(self,trainfile,propertyfile):
